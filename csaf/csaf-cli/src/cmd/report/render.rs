@@ -151,6 +151,68 @@ impl HtmlReport<'_> {
         Ok(())
     }
 
+    fn render_warnings(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        Self::title(f, "Warnings", self.0.warnings.len())?;
+
+        if !self.0.warnings.is_empty() {
+            let num = self.0.warnings.len();
+            let s = match num {
+                1 => "",
+                _ => "s",
+            };
+            writeln!(f, "<p>{num} warnings{s} detected</p>")?;
+
+            writeln!(
+                f,
+                r#"
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">File</th>
+                <th scope="col">Error</th>
+            </tr>
+        </thead>
+
+        <tbody>
+"#
+            )?;
+
+            for (k, v) in self.0.warnings {
+                let k: Cow<str> = match (&self.1.base_url, Url::parse(k)) {
+                    (Some(base_url), Ok(url)) => match base_url.make_relative(&url) {
+                        Some(url) => Cow::Owned(url),
+                        None => Cow::Borrowed(k),
+                    },
+                    _ => Cow::Borrowed(k),
+                };
+
+                for text in v {
+                    writeln!(
+                        f,
+                        r#"
+            <tr>
+                <td><a href="{k}" target="_blank">{k}</a></td>
+                <td><code>{v}</code></td>
+            </tr>
+            "#,
+                        k = html_escape::encode_quoted_attribute(&k),
+                        v = html_escape::encode_text(&text),
+                    )?;
+                }
+            }
+
+            writeln!(
+                f,
+                r#"
+        <tbody>
+    </table>
+"#
+            )?;
+        }
+
+        Ok(())
+    }
+
     fn title(f: &mut Formatter<'_>, title: &str, count: usize) -> std::fmt::Result {
         write!(f, "<h2>{title}")?;
 
@@ -184,7 +246,7 @@ impl<'r> Display for HtmlReport<'r> {
 
         self.render_duplicates(f)?;
         self.render_errors(f)?;
-
+        self.render_warnings(f)?;
         Ok(())
     }
 }

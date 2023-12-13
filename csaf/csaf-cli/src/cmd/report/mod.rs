@@ -128,7 +128,6 @@ impl Report {
             )
             .await?;
         }
-
         Self::render(
             self.render,
             ReportResult {
