@@ -1,3 +1,4 @@
+workspace = { members = ["runjs"] }
 [package]
 name = "csaf-walker"
 description = "A library to work with CSAF data"
@@ -45,7 +46,7 @@ csaf = { version = "0.5", default-features = false, optional = true }
 deno_core = { version = "0.246.0", optional = true }
 
 [features]
-default = ["crypto-nettle", "csaf"]
+default = ["crypto-nettle", "csaf", "csaf-validator-lib"]
 crypto-cng = ["sequoia-openpgp/crypto-cng"]
 crypto-nettle = ["sequoia-openpgp/crypto-nettle"]
 crypto-openssl = ["sequoia-openpgp/crypto-openssl"]
