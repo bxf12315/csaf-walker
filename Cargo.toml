@@ -6,7 +6,7 @@ members = [
     "csaf/csaf-cli",
     "sbom",
     "sbom/sbom-cli",
-    "extras",
+    "extras", "verification-js",
 ]
 
 [workspace.metadata.release]
